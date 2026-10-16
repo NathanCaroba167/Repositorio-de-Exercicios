@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+@import 'tailwindcss';
+
+:root {
+    font-family: 'Manrope', sans-serif;
+    color: #17202f;
+    background: #f7f8fb;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+button,
+a,
+select {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button,
+select {
+    cursor: pointer;
+}
+
+::selection {
+    background: #ffedd5;
+    color: #9A4520;
+}
