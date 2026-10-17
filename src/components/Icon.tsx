@@ -1,6 +1,6 @@
 import React from "react";
 
-export type IconName = "arrow" | "book" | "bookmark" | "calendar" | "check" | "chevron" | "clock" | "eye" | "eyeOff" | "filter" | "grid" | "search" | "spark" | "thumb" | "trend" | "user"
+export type IconName = "arrow" | "book" | "bookmark" | "calendar" | "check" | "chevron" | "clock" | "close" | "eye" | "eyeOff" | "filter" | "grid" | "search" | "spark" | "thumb" | "trend" | "user"
 
 export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
     const paths: Record<IconName, React.ReactNode> = {
@@ -29,6 +29,12 @@ export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
             <>
                 <circle cx="12" cy="12" r="9" />
                 <path d="M12 7v5l3 2" />
+            </>
+        ),
+        close: (
+            <>
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
             </>
         ),
         eye: (

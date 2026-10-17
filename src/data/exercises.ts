@@ -221,6 +221,8 @@ export const subjectCatalog = [
     },
 ] as const
 
+export type Exercise = typeof exercises[number];
+
 export const exercises = subjectCatalog.flatMap((subject, subjectIndex) =>
     subject.items.map((item, itemIndex) => ({
         id: subjectIndex * 2 + itemIndex + 1,
