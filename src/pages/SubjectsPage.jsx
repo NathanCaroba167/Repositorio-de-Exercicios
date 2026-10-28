@@ -7,7 +7,6 @@ import { PageSection } from "../components/PageSection";
 import { toSlug } from "../components/ToSlug";
 
 import { EmptyState } from "../components/EmptyState.jsx";
-import { NotFoundPage } from "@/pages/NotFoundPage.jsx";
 
 export function SubjectsPage() {
     const { enrolled, completed } = useStudy();
