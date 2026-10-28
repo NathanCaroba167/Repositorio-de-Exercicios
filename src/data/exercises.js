@@ -219,9 +219,7 @@ export const subjectCatalog = [
             ],
         ],
     },
-] as const
-
-export type Exercise = typeof exercises[number];
+];
 
 export const exercises = subjectCatalog.flatMap((subject, subjectIndex) =>
     subject.items.map((item, itemIndex) => ({
@@ -238,17 +236,17 @@ export const exercises = subjectCatalog.flatMap((subject, subjectIndex) =>
         lesson: `Aula ${itemIndex + 1}`,
         time: itemIndex === 0 ? "Há 2 horas" : "Ontem",
         engagement: 34 + subjectIndex * 11 + itemIndex * 7,
-    })),
-)
+    }))
+);
 
-export const colorClasses: Record<string, string> = {
+export const colorClasses = {
     blue: "bg-blue-50 text-blue-700 border-blue-100",
     violet: "bg-violet-50 text-violet-700 border-violet-100",
     green: "bg-emerald-50 text-emerald-700 border-emerald-100",
     orange: "bg-orange-50 text-orange-700 border-orange-100",
     rose: "bg-rose-50 text-rose-700 border-rose-100",
     cyan: "bg-cyan-50 text-cyan-700 border-cyan-100",
-}
+};
 
-export const subjects = [...new Set(exercises.map((item) => item.subject))]
-export const professors = [...new Set(exercises.map((item) => item.professor))]
+export const subjects = [...new Set(exercises.map((item) => item.subject))];
+export const professors = [...new Set(exercises.map((item) => item.professor))];

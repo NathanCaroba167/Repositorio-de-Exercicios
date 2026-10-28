@@ -1,13 +1,10 @@
-import { Icon } from "@/components/Icon"
-import { Exercise, colorClasses } from "@/data/exercises"
+import { Icon } from "./Icon";
+import { colorClasses } from "../data/exercises";
 
 export function SolutionModal({
                                   selected,
                                   onClose,
-                              }: {
-    selected: Exercise | null
-    onClose: () => void
-}) {
+                              }) {
     if (!selected) return null
 
     return (
@@ -23,11 +20,11 @@ export function SolutionModal({
             >
                 <div className="sticky top-0 z-10 flex items-start justify-between border-b border-slate-100 bg-white/95 px-6 py-5 backdrop-blur sm:px-8">
                     <div>
-            <span
-                className={`inline-flex rounded-lg border px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.08em] ${colorClasses[selected.color]}`}
-            >
-              {selected.subject}
-            </span>
+                        <span
+                            className={`inline-flex rounded-lg border px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.08em] ${colorClasses[selected.color]}`}
+                        >
+                            {selected.subject}
+                        </span>
                         <h2
                             id="solution-title"
                             className="mt-3 text-2xl font-extrabold tracking-[-0.03em] text-slate-950"
@@ -45,15 +42,15 @@ export function SolutionModal({
                 </div>
                 <div className="px-6 py-6 sm:px-8 sm:py-8">
                     <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-slate-500">
-            <span className="flex items-center gap-2">
-              <Icon name="user" size={15} /> Prof. {selected.professor}
-            </span>
                         <span className="flex items-center gap-2">
-              <Icon name="grid" size={15} /> {selected.code}
-            </span>
+                            <Icon name="user" size={15} /> Prof. {selected.professor}
+                        </span>
                         <span className="flex items-center gap-2">
-              <Icon name="bookmark" size={15} /> {selected.difficulty}
-            </span>
+                            <Icon name="grid" size={15} /> {selected.code}
+                        </span>
+                        <span className="flex items-center gap-2">
+                            <Icon name="bookmark" size={15} /> {selected.difficulty}
+                        </span>
                     </div>
                     <div className="mt-7">
                         <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-slate-400">
@@ -65,9 +62,9 @@ export function SolutionModal({
                     </div>
                     <div className="mt-7 rounded-2xl border border-orange-100 bg-orange-50 p-5 sm:p-6">
                         <div className="flex items-center gap-2 text-orange-700">
-              <span className="grid size-8 place-items-center rounded-lg bg-white shadow-sm">
-                <Icon name="spark" size={17} />
-              </span>
+                            <span className="grid size-8 place-items-center rounded-lg bg-white shadow-sm">
+                                <Icon name="spark" size={17} />
+                            </span>
                             <p className="text-xs font-extrabold uppercase tracking-[0.12em]">
                                 Solução comentada
                             </p>

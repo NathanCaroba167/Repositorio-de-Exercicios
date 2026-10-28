@@ -15,6 +15,6 @@ export default defineConfig({
         },
     },
     server: {
-        port: 5173, // Porta padrão do Vite
+        port: 5173,
     },
 })

@@ -6,13 +6,7 @@ export function PageSection({
                                 description,
                                 action,
                                 children,
-                            }: {
-    eyebrow: string
-    title: string
-    description: string
-    action?: React.ReactNode
-    children: React.ReactNode
-}) {
+                            }) {
     return (
         <section className="mx-auto min-h-[calc(100vh-146px)] max-w-[1280px] px-5 py-10 lg:px-8 lg:py-14">
             <div className="mb-8 flex items-end justify-between gap-4">

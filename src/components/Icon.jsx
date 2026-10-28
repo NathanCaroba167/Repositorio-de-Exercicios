@@ -1,9 +1,7 @@
 import React from "react";
 
-export type IconName = "arrow" | "book" | "bookmark" | "calendar" | "check" | "chevron" | "clock" | "close" | "eye" | "eyeOff" | "filter" | "grid" | "search" | "spark" | "thumb" | "trend" | "user"
-
-export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
-    const paths: Record<IconName, React.ReactNode> = {
+export function Icon({ name, size = 20 }) {
+    const paths = {
         arrow: (
             <>
                 <path d="M5 12h14" />

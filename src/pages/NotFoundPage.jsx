@@ -2,7 +2,7 @@ import { useNavigate } from "react-router";
 import { PageSection } from "../components/PageSection";
 
 export function NotFoundPage() {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     return (
         <PageSection
             eyebrow="Erro 404"
@@ -16,5 +16,5 @@ export function NotFoundPage() {
                 Voltar para a busca
             </button>
         </PageSection>
-    )
+    );
 }

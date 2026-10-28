@@ -26,26 +26,26 @@ export function ExercisePage() {
                     to={`/materias/${toSlug(exercise.subject)}`}
                     className="mb-5 inline-flex items-center gap-2 text-sm font-bold text-slate-500 transition hover:text-orange-600"
                 >
-          <span className="rotate-180">
-            <Icon name="arrow" size={16} />
-          </span>
+                    <span className="rotate-180">
+                        <Icon name="arrow" size={16} />
+                    </span>
                     Voltar para {exercise.subject}
                 </Link>
                 <article className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_12px_40px_rgba(18,32,64,0.06)]">
                     <div className="border-b border-slate-100 px-6 py-6 sm:px-9">
                         <div className="flex flex-wrap gap-x-6 gap-y-3 text-xs text-slate-500">
-              <span className="flex items-center gap-2">
-                <Icon name="user" size={15} /> Prof. {exercise.professor}
-              </span>
                             <span className="flex items-center gap-2">
-                <Icon name="bookmark" size={15} /> {exercise.difficulty}
-              </span>
+                                <Icon name="user" size={15} /> Prof. {exercise.professor}
+                            </span>
                             <span className="flex items-center gap-2">
-                <Icon name="grid" size={15} /> {exercise.lesson}
-              </span>
+                                <Icon name="bookmark" size={15} /> {exercise.difficulty}
+                            </span>
                             <span className="flex items-center gap-2">
-                <Icon name="clock" size={15} /> {exercise.time}
-              </span>
+                                <Icon name="grid" size={15} /> {exercise.lesson}
+                            </span>
+                            <span className="flex items-center gap-2">
+                                <Icon name="clock" size={15} /> {exercise.time}
+                            </span>
                         </div>
                     </div>
                     <div className="px-6 py-7 sm:px-9 sm:py-9">
@@ -58,9 +58,9 @@ export function ExercisePage() {
                         <div className="mt-9 overflow-hidden rounded-2xl border border-orange-100 bg-orange-50">
                             <div className="flex items-center justify-between gap-4 px-5 py-4 sm:px-6">
                                 <div className="flex items-center gap-3 text-orange-700">
-                  <span className="grid size-9 place-items-center rounded-lg bg-white shadow-sm">
-                    <Icon name="spark" size={17} />
-                  </span>
+                                    <span className="grid size-9 place-items-center rounded-lg bg-white shadow-sm">
+                                        <Icon name="spark" size={17} />
+                                    </span>
                                     <div>
                                         <p className="text-xs font-extrabold uppercase tracking-[0.12em]">
                                             Resposta comentada
@@ -79,8 +79,8 @@ export function ExercisePage() {
                                 >
                                     <Icon name={showSolution ? "eyeOff" : "eye"} size={17} />
                                     <span className="hidden sm:inline">
-                    {showSolution ? "Ocultar resposta" : "Mostrar resposta"}
-                  </span>
+                                        {showSolution ? "Ocultar resposta" : "Mostrar resposta"}
+                                    </span>
                                 </button>
                             </div>
                             {showSolution && (

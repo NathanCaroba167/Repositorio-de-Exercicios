@@ -1,28 +1,24 @@
 import { useState } from "react";
-import {useSearchParams, Link, useParams} from "react-router";
+import { useSearchParams, Link, useParams } from "react-router";
 import { useStudy } from "../components/UseStudy";
 import { exercises, subjects, professors, colorClasses } from "../data/exercises";
-import {Icon, IconName} from "../components/Icon";
+import { Icon } from "../components/Icon";
 import { PageSection } from "../components/PageSection";
 import { toSlug } from "../components/ToSlug";
-import { EmptyState } from "../components/EmptySpace";
-import {NotFoundPage} from "@/pages/NotFoundPage.tsx";
+import { EmptyState } from "../components/EmptyState.jsx";
+import { NotFoundPage } from "@/pages/NotFoundPage.jsx";
 
 export function StatCard({
-                      icon,
-                      label,
-                      value,
-                  }: {
-    icon: IconName
-    label: string
-    value: string
-}) {
+                             icon,
+                             label,
+                             value,
+                         }) {
     return (
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
             <div className="flex items-center gap-3">
-        <span className="grid size-10 place-items-center rounded-xl bg-orange-50 text-orange-700">
-          <Icon name={icon} size={19} />
-        </span>
+                <span className="grid size-10 place-items-center rounded-xl bg-orange-50 text-orange-700">
+                    <Icon name={icon} size={19} />
+                </span>
                 <div>
                     <p className="text-2xl font-extrabold tracking-[-0.03em] text-slate-950">
                         {value}
@@ -87,9 +83,9 @@ export function SubjectPage() {
                         className="scroll-mt-36 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
                     >
                         <div className="flex gap-4 sm:gap-6">
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-orange-50 text-sm font-extrabold text-orange-700">
-                {String(index + 1).padStart(2, "0")}
-              </span>
+                            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-orange-50 text-sm font-extrabold text-orange-700">
+                                {String(index + 1).padStart(2, "0")}
+                            </span>
                             <div className="min-w-0 flex-1">
                                 <p className="text-xs font-extrabold uppercase tracking-[0.1em] text-orange-600">
                                     {exercise.content}
