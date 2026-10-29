@@ -250,3 +250,7 @@ export const colorClasses = {
 
 export const subjects = [...new Set(exercises.map((item) => item.subject))];
 export const professors = [...new Set(exercises.map((item) => item.professor))];
+export async function fetchExercicios(filtros = {}) {
+    const { getExercicios } = await import('../services/api.js');
+    return getExercicios(filtros);
+}
