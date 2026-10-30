@@ -5,7 +5,8 @@ const jwt = require('jsonwebtoken');
 // Cadastro
 async function cadastrar(req, res) {
     try {
-        const { nome, email, senha, tipo } = req.body;
+        const { nome, email, senha } = req.body;
+        const tipo = 'aluno'; // cadastro público é sempre aluno
 
         // Verifica se email já existe
         const existe = await pool.query('SELECT id FROM usuarios WHERE email = $1', [email]);
