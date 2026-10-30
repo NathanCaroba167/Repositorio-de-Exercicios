@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 
 function autenticar(req, res, next) {
-    console.log('MIDDLEWARE autenticar executado');
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

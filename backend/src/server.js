@@ -11,6 +11,7 @@ require('./config/database');
 
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/exercicios', require('./routes/exercicios'));
+app.use('/api/duvidas', require('./routes/duvidas'));
 
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Servidor Exercita rodando!' });
