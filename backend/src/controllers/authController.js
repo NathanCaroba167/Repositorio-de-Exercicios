@@ -2,35 +2,47 @@ const pool = require('../config/database');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// Cadastro
+const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function gerarToken(usuario) {
+    return jwt.sign(
+        { id: usuario.id, tipo: usuario.tipo },
+        process.env.JWT_SECRET,
+        { expiresIn: '7d' }
+    );
+}
+
+// Cadastro público: sempre cria aluno
 async function cadastrar(req, res) {
     try {
-        const { nome, email, senha } = req.body;
-        const tipo = 'aluno'; // cadastro público é sempre aluno
+        const { nome, senha } = req.body;
+        const email = typeof req.body.email === 'string' ? req.body.email.trim().toLowerCase() : '';
 
-        // Verifica se email já existe
+        if (!nome || !nome.trim() || !email || !senha) {
+            return res.status(400).json({ erro: 'Informe nome, email e senha' });
+        }
+        if (!EMAIL_VALIDO.test(email)) {
+            return res.status(400).json({ erro: 'E-mail inválido' });
+        }
+        if (typeof senha !== 'string' || senha.length < 8) {
+            return res.status(400).json({ erro: 'A senha deve ter pelo menos 8 caracteres' });
+        }
+
         const existe = await pool.query('SELECT id FROM usuarios WHERE email = $1', [email]);
         if (existe.rows.length) {
             return res.status(400).json({ erro: 'E-mail já cadastrado' });
         }
 
-        // Gera o hash da senha
         const senha_hash = await bcrypt.hash(senha, 10);
 
         const resultado = await pool.query(
             `INSERT INTO usuarios (nome, email, senha_hash, tipo)
-       VALUES ($1, $2, $3, $4) RETURNING id, nome, email, tipo`,
-            [nome, email, senha_hash, tipo]
+       VALUES ($1, $2, $3, 'aluno') RETURNING id, nome, email, tipo`,
+            [nome.trim(), email, senha_hash]
         );
 
         const usuario = resultado.rows[0];
-        const token = jwt.sign(
-            { id: usuario.id, tipo: usuario.tipo },
-            process.env.JWT_SECRET,
-            { expiresIn: '7d' }
-        );
-
-        res.status(201).json({ usuario, token });
+        res.status(201).json({ usuario, token: gerarToken(usuario) });
     } catch (err) {
         res.status(500).json({ erro: err.message });
     }
@@ -39,12 +51,14 @@ async function cadastrar(req, res) {
 // Login
 async function login(req, res) {
     try {
-        const { email, senha } = req.body;
+        const { senha } = req.body;
+        const email = typeof req.body.email === 'string' ? req.body.email.trim().toLowerCase() : '';
 
-        const resultado = await pool.query(
-            'SELECT * FROM usuarios WHERE email = $1',
-            [email]
-        );
+        if (!email || !senha || typeof senha !== 'string') {
+            return res.status(400).json({ erro: 'Informe email e senha' });
+        }
+
+        const resultado = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
 
         if (!resultado.rows.length) {
             return res.status(401).json({ erro: 'E-mail ou senha incorretos' });
@@ -57,15 +71,9 @@ async function login(req, res) {
             return res.status(401).json({ erro: 'E-mail ou senha incorretos' });
         }
 
-        const token = jwt.sign(
-            { id: usuario.id, tipo: usuario.tipo },
-            process.env.JWT_SECRET,
-            { expiresIn: '7d' }
-        );
-
         res.json({
             usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email, tipo: usuario.tipo },
-            token
+            token: gerarToken(usuario),
         });
     } catch (err) {
         res.status(500).json({ erro: err.message });

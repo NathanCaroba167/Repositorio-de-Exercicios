@@ -41,6 +41,35 @@ describe('cadastro', () => {
 
         expect(res.status).toBe(400);
     });
+
+    it('rejeita senha curta: 400', async () => {
+        const res = await request(app)
+            .post('/api/auth/cadastrar')
+            .send({ nome: 'Ana', email: 'ana@uel.br', senha: '123' });
+        expect(res.status).toBe(400);
+    });
+
+    it('rejeita e-mail inválido: 400', async () => {
+        const res = await request(app)
+            .post('/api/auth/cadastrar')
+            .send({ nome: 'Ana', email: 'isso-nao-e-email', senha: 'segredo1' });
+        expect(res.status).toBe(400);
+    });
+
+    it('rejeita campos faltando: 400', async () => {
+        const res = await request(app).post('/api/auth/cadastrar').send({ nome: 'Ana' });
+        expect(res.status).toBe(400);
+    });
+
+    it('trata e-mail sem diferenciar maiúsculas: 400 no repetido', async () => {
+        await request(app)
+            .post('/api/auth/cadastrar')
+            .send({ nome: 'Ana', email: 'ana@uel.br', senha: 'segredo1' });
+        const res = await request(app)
+            .post('/api/auth/cadastrar')
+            .send({ nome: 'Ana', email: 'ANA@UEL.BR', senha: 'segredo1' });
+        expect(res.status).toBe(400);
+    });
 });
 
 describe('login', () => {
@@ -73,5 +102,10 @@ describe('login', () => {
             .send({ email: 'fantasma@uel.br', senha: 'segredo1' });
 
         expect(res.status).toBe(401);
+    });
+
+    it('login sem enviar dados: 400', async () => {
+        const res = await request(app).post('/api/auth/login').send({});
+        expect(res.status).toBe(400);
     });
 });

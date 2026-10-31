@@ -1,16 +1,34 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
 
+if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET não definido no .env');
+}
+
 const app = express();
 
-app.use(cors());
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+
+app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }));
+
 app.use(express.json());
 
 require('./config/database');
 
-app.use('/api/auth', require('./routes/auth'));
+const limiteAuth = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: () => process.env.NODE_ENV === 'test',
+    message: { erro: 'Muitas tentativas. Tente novamente em alguns minutos.' },
+});
+
+app.use('/api/auth', limiteAuth, require('./routes/auth'));
 app.use('/api/exercicios', require('./routes/exercicios'));
 app.use('/api/duvidas', require('./routes/duvidas'));
 app.use('/api/disciplinas', require('./routes/disciplinas'));
