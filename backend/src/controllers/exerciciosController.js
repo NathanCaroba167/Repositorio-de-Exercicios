@@ -9,7 +9,8 @@ async function listar(req, res) {
       SELECT e.id, e.titulo, e.conteudo, e.descricao, e.solucao,
              e.dificuldade, e.aula, e.criado_em,
              d.nome AS disciplina, d.codigo, d.cor,
-             u.nome AS professor
+             u.nome AS professor,
+            (SELECT COUNT(*) FROM uteis WHERE exercicio_id = e.id)::int AS total_uteis
       FROM exercicios e
       JOIN disciplinas d ON e.disciplina_id = d.id
       JOIN usuarios u ON d.professor_id = u.id
@@ -44,7 +45,8 @@ async function buscarPorId(req, res) {
     try {
         const { id } = req.params;
         const resultado = await pool.query(
-            `SELECT e.*, d.nome AS disciplina, d.codigo, d.cor, u.nome AS professor
+            `SELECT e.*, d.nome AS disciplina, d.codigo, d.cor, u.nome AS professor,
+            (SELECT COUNT(*) FROM uteis WHERE exercicio_id = e.id)::int AS total_uteis
        FROM exercicios e
        JOIN disciplinas d ON e.disciplina_id = d.id
        JOIN usuarios u ON d.professor_id = u.id
