@@ -1,9 +1,13 @@
-import { NavLink, Outlet } from "react-router";
+import { NavLink, Outlet, useNavigate } from "react-router";
+import { useAuth } from "./AuthProvider";
 import { Icon } from "./Icon";
 import { StudyProvider } from "./StudyProvider";
 import { DoubtModal } from "./DoubtModal";
 
 export function AppShell() {
+    const { usuario, sair } = useAuth();
+    const navigate = useNavigate();
+
     return (
         <StudyProvider>
             <div className="min-h-screen bg-[#f7f8fb] text-[#17202f]">
@@ -59,12 +63,26 @@ export function AppShell() {
                                 </NavLink>
                             ))}
                         </nav>
-                        <button
-                            className="hidden size-10 place-items-center rounded-full border border-slate-200 bg-slate-50 text-slate-600 transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700 sm:grid"
-                            aria-label="Abrir perfil"
-                        >
-                            <Icon name="user" size={19} />
-                        </button>
+                        {usuario ? (
+                            <div className="hidden items-center gap-3 sm:flex">
+                                <span className="text-sm font-semibold text-slate-600">
+                                     {usuario.nome.split(" ")[0]}
+                                 </span>
+                                <button
+                                    onClick={() => { sair(); navigate("/"); }}
+                                    className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-600 transition hover:border-orange-200 hover:text-orange-700"
+                                >
+                                    Sair
+                                </button>
+                            </div>
+                        ) : (
+                            <NavLink
+                                to="/login"
+                                className="hidden rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-orange-700 sm:inline-flex"
+                            >
+                                Entrar
+                            </NavLink>
+                        )}
                     </div>
                 </header>
                 <main>

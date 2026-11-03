@@ -3,6 +3,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const swaggerUi = require('swagger-ui-express');
+const openapi = require('./docs/openapi');
 require('dotenv').config();
 
 if (!process.env.JWT_SECRET) {
@@ -39,5 +41,8 @@ app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Servidor Exercita rodando!' });
 });
+
+app.get('/api/docs.json', (req, res) => res.json(openapi));
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openapi));
 
 module.exports = app;

@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router"
+import { AuthProvider } from "./components/AuthProvider"
 import { AppShell } from "./components/AppShell"
 import { SearchPage } from "./pages/SearchPage"
 import { SubjectsPage } from "./pages/SubjectsPage"
@@ -13,7 +14,6 @@ import { RegisterPage } from "./pages/RegisterPage"
 export const router = createBrowserRouter([
     { path: "/login", Component: LoginPage },
     { path: "/cadastro", Component: RegisterPage },
-
     {
         path: "/",
         Component: AppShell,
@@ -30,5 +30,9 @@ export const router = createBrowserRouter([
 ])
 
 export default function App() {
-    return <RouterProvider router={router} />
+    return (
+        <AuthProvider>
+            <RouterProvider router={router} />
+        </AuthProvider>
+    )
 }

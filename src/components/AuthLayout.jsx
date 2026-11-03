@@ -30,7 +30,9 @@ export function AuthLayout({ children }) {
             <div className="flex flex-1 flex-col items-center justify-center p-6 sm:p-12">
                 <div className="w-full max-w-[400px]">
                     <Link to="/" className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-slate-400 transition hover:text-orange-600">
-                        <Icon name="arrow" size={16} className="rotate-180" />
+                        <span className="rotate-180">
+                            <Icon name="arrow" size={16} />
+                        </span>
                         Voltar para o Exercita
                     </Link>
                     {children}
