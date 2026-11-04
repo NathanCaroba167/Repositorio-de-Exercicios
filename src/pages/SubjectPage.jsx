@@ -23,6 +23,15 @@ export function SubjectPage() {
             title={subject}
             description={`${items[0].code} · ${items.length} conteúdos organizados para você estudar em sequência.`}
             action={
+                <div className="flex items-center gap-3">
+                    {enrolled.includes(subject) && (
+                        <button
+                            onClick={() => openDoubtModal(subject)}
+                            className="hidden items-center rounded-xl bg-[#fb923c] px-6 py-2.5 text-sm font-bold text-slate-900 transition hover:bg-orange-500 sm:inline-flex"
+                        >
+                            Tirar dúvidas
+                        </button>
+                    )}
                 <button
                     onClick={() => toggleEnrolled(subject)}
                     className={`hidden items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition sm:inline-flex ${
@@ -39,6 +48,7 @@ export function SubjectPage() {
                         ? "Matéria em curso"
                         : "Adicionar ao meu curso"}
                 </button>
+                </div>
             }
         >
             <div className="sticky top-[74px] z-20 -mx-5 mb-8 border-y border-slate-200 bg-[#f7f8fb]/95 px-5 py-3 backdrop-blur lg:-mx-8 lg:px-8">

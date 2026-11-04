@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from "react-router";
 import { Icon } from "./Icon";
 import { StudyProvider } from "./StudyProvider";
+import { DoubtModal } from "./DoubtModal";
 
 export function AppShell() {
     return (
@@ -69,6 +70,9 @@ export function AppShell() {
                 <main>
                     <Outlet />
                 </main>
+
+                <DoubtModal />
+
                 <footer className="border-t border-slate-200 bg-white px-5 py-6 text-center text-xs text-slate-400">
                     Exercita · Seu repositório de exercícios e soluções
                 </footer>

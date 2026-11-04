@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router";
 import { useStudy } from "../components/UseStudy";
 import { exercises } from "../data/exercises";
@@ -6,54 +6,108 @@ import { PageSection } from "../components/PageSection";
 import { toSlug } from "../components/ToSlug";
 import { Icon } from "../components/Icon";
 import { NotFoundPage } from "./NotFoundPage";
+import { getExercicios } from "../services/api";
 
 export function ExercisePage() {
-    const { exerciseId } = useParams()
-    const { completed, liked, toggleCompleted, toggleLiked } = useStudy()
-    const exercise = exercises.find((item) => item.id === Number(exerciseId))
-    const [showSolution, setShowSolution] = useState(false)
+    const { exerciseId } = useParams();
 
-    if (!exercise) return <NotFoundPage />
+    const { completed, liked, toggleCompleted, toggleLiked, openDoubtModal } = useStudy();
+
+    const [showSolution, setShowSolution] = useState(false);
+
+    const [exerciciosAPI, setExerciciosAPI] = useState([]);
+    const [carregando, setCarregando] = useState(true);
+
+    useEffect(() => {
+        getExercicios()
+            .then((dados) => {
+                setExerciciosAPI(dados);
+            })
+            .catch((erro) => {
+                console.error("Erro ao buscar exercícios da API:", erro);
+            })
+            .finally(() => {
+                setCarregando(false);
+            });
+    }, []);
+
+    const fonte = exerciciosAPI.length > 0 ? exerciciosAPI : exercises;
+
+    const exercise = fonte.find((item) => String(item.id) === String(exerciseId));
+
+    if (carregando) {
+        return (
+            <PageSection eyebrow="Aguarde" title="Carregando exercício...">
+                <div className="flex justify-center py-12">
+                    <span className="text-sm font-semibold text-slate-400">Buscando detalhes...</span>
+                </div>
+            </PageSection>
+        );
+    }
+
+    if (!exercise) return <NotFoundPage />;
+
+    const subject = exercise.disciplina || exercise.subject;
+    const title = exercise.titulo || exercise.title;
+    const content = exercise.conteudo || exercise.content;
+    const code = exercise.codigo || exercise.code;
+    const description = exercise.descricao || exercise.description;
+    const solution = exercise.solucao || exercise.solution;
+    const professor = exercise.professor;
+    const difficulty = exercise.dificuldade || exercise.difficulty || "Intermediário";
+    const lesson = exercise.aula || exercise.lesson || "Aula 1";
+    const time = exercise.tempo || exercise.time || "Há pouco";
+    const engagement = exercise.engajamento || exercise.engagement || 12;
 
     return (
         <PageSection
-            eyebrow={exercise.content}
-            title={exercise.title}
-            description={`${exercise.subject} · ${exercise.code}`}
+            eyebrow={content}
+            title={title}
+            description={`${subject} · ${code}`}
         >
             <div className="mx-auto max-w-4xl">
                 <Link
-                    to={`/materias/${toSlug(exercise.subject)}`}
+                    to={`/materias/${toSlug(subject)}`}
                     className="mb-5 inline-flex items-center gap-2 text-sm font-bold text-slate-500 transition hover:text-orange-600"
                 >
                     <span className="rotate-180">
                         <Icon name="arrow" size={16} />
                     </span>
-                    Voltar para {exercise.subject}
+                    Voltar para {subject}
                 </Link>
                 <article className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_12px_40px_rgba(18,32,64,0.06)]">
-                    <div className="border-b border-slate-100 px-6 py-6 sm:px-9">
+
+                    <div className="flex flex-wrap items-center justify-between border-b border-slate-100 px-6 py-4 sm:px-9">
                         <div className="flex flex-wrap gap-x-6 gap-y-3 text-xs text-slate-500">
                             <span className="flex items-center gap-2">
-                                <Icon name="user" size={15} /> Prof. {exercise.professor}
+                                <Icon name="user" size={15} /> Prof. {professor}
                             </span>
                             <span className="flex items-center gap-2">
-                                <Icon name="bookmark" size={15} /> {exercise.difficulty}
+                                <Icon name="bookmark" size={15} /> {difficulty}
                             </span>
                             <span className="flex items-center gap-2">
-                                <Icon name="grid" size={15} /> {exercise.lesson}
+                                <Icon name="grid" size={15} /> {lesson}
                             </span>
                             <span className="flex items-center gap-2">
-                                <Icon name="clock" size={15} /> {exercise.time}
+                                <Icon name="clock" size={15} /> {time}
                             </span>
                         </div>
+
+                        <button
+                            onClick={() => openDoubtModal(subject, title)}
+                            className="mt-2 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-600 transition hover:border-orange-200 hover:text-orange-700 sm:mt-0"
+                        >
+                            <Icon name="doubt" size={24} />
+                            <span className="font-bold">Tirar dúvidas</span>
+                        </button>
                     </div>
+
                     <div className="px-6 py-7 sm:px-9 sm:py-9">
                         <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-slate-400">
                             Enunciado
                         </p>
-                        <p className="mt-4 text-base leading-8 text-slate-700">
-                            {exercise.description}
+                        <p className="mt-4 text-base leading-8 text-slate-700 whitespace-pre-wrap">
+                            {description}
                         </p>
                         <div className="mt-9 overflow-hidden rounded-2xl border border-orange-100 bg-orange-50">
                             <div className="flex items-center justify-between gap-4 px-5 py-4 sm:px-6">
@@ -85,8 +139,8 @@ export function ExercisePage() {
                             </div>
                             {showSolution && (
                                 <div className="border-t border-orange-100 bg-white/55 px-5 py-5 sm:px-6">
-                                    <p className="text-[15px] leading-7 text-slate-700">
-                                        {exercise.solution}
+                                    <p className="text-[15px] leading-7 text-slate-700 whitespace-pre-wrap">
+                                        {solution}
                                     </p>
                                 </div>
                             )}
@@ -97,7 +151,7 @@ export function ExercisePage() {
                                     Registre seu progresso
                                 </p>
                                 <p className="mt-1 text-xs text-slate-500">
-                                    {exercise.engagement + (liked.includes(exercise.id) ? 1 : 0)}{" "}
+                                    {engagement + (liked.includes(exercise.id) ? 1 : 0)}{" "}
                                     estudantes consideraram este exercício útil.
                                 </p>
                             </div>
@@ -136,5 +190,5 @@ export function ExercisePage() {
                 </article>
             </div>
         </PageSection>
-    )
+    );
 }

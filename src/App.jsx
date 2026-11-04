@@ -7,8 +7,13 @@ import { RecentPage } from "./pages/RecentPage"
 import { NotFoundPage } from "./pages/NotFoundPage"
 import { MyCoursePage } from "./pages/MyCoursePage"
 import { ExercisePage } from "./pages/ExercisePage"
+import { LoginPage } from "./pages/LoginPage"
+import { RegisterPage } from "./pages/RegisterPage"
 
 export const router = createBrowserRouter([
+    { path: "/login", Component: LoginPage },
+    { path: "/cadastro", Component: RegisterPage },
+
     {
         path: "/",
         Component: AppShell,

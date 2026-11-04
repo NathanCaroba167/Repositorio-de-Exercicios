@@ -21,6 +21,13 @@ export function StudyProvider({ children }) {
     const [liked, setLiked] = useState(() =>
         getStoredList("exercita-liked", [])
     );
+    const [doubtContext, setDoubtContext] = useState({ isOpen: false, subject: '', exercise: '' })
+    const openDoubtModal = (subject, exercise = '') => {
+        setDoubtContext({ isOpen: true, subject, exercise })
+    }
+    const closeDoubtModal = () => {
+        setDoubtContext({ isOpen: false, subject: '', exercise: '' })
+    }
 
     function toggleItem(key, item, setter) {
         setter((current) => {
@@ -44,6 +51,9 @@ export function StudyProvider({ children }) {
                     toggleItem("exercita-completed", exerciseId, setCompleted),
                 toggleLiked: (exerciseId) =>
                     toggleItem("exercita-liked", exerciseId, setLiked),
+                doubtContext,
+                openDoubtModal,
+                closeDoubtModal
             }}
         >
             {children}

@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router";
 import { useStudy } from "../components/UseStudy";
-import { exercises, subjects, professors, colorClasses } from "../data/exercises";
+import { exercises, colorClasses } from "../data/exercises";
 import { Icon } from "../components/Icon";
 import { PageSection } from "../components/PageSection";
 import { toSlug } from "../components/ToSlug";
-import { EmptyState } from "../components/EmptyState.jsx";
-import { getExercicios } from "../services/api.js";
+import { EmptyState } from "../components/EmptyState";
+import { getExercicios } from "../services/api";
 
 export function SubjectsPage() {
     const { enrolled, completed } = useStudy();
@@ -14,22 +14,31 @@ export function SubjectsPage() {
     const query = searchParams.get("q")?.trim().toLocaleLowerCase("pt-BR") ?? "";
     const [professor, setProfessor] = useState("Todos os professores");
     const [showFilters, setShowFilters] = useState(false);
+
+    // Estados da API
     const [exerciciosAPI, setExerciciosAPI] = useState([]);
     const [carregando, setCarregando] = useState(true);
 
     useEffect(() => {
-        getExercicios().then((dados) => {
-            setExerciciosAPI(dados);
-            setCarregando(false);
-        });
+        getExercicios()
+            .then((dados) => {
+                setExerciciosAPI(dados);
+            })
+            .catch((erro) => {
+                console.error("Erro ao buscar exercícios da API:", erro);
+            })
+            .finally(() => {
+                setCarregando(false);
+            });
     }, []);
 
-    const fonte = exerciciosAPI.length ? exerciciosAPI : exercises;
+    // Usa a API se houver dados, senão usa o mock local de fallback
+    const fonte = exerciciosAPI.length > 0 ? exerciciosAPI : exercises;
 
+    // Lógica de Filtros e Busca adaptada para funcionar com API (português) ou Mock (inglês)
     const matchingExercises = fonte.filter(
         (exercise) =>
-            (professor === "Todos os professores" ||
-                exercise.professor === professor) &&
+            (professor === "Todos os professores" || exercise.professor === professor) &&
             (!query ||
                 `${exercise.titulo || exercise.title} ${exercise.conteudo || exercise.content} ${exercise.descricao || exercise.description} ${exercise.disciplina || exercise.subject} ${exercise.professor}`
                     .toLocaleLowerCase("pt-BR")
@@ -40,12 +49,16 @@ export function SubjectsPage() {
         (item) => matchingExercises.some((e) => (e.disciplina || e.subject) === item)
     );
 
-    const allProfessors = [...new Set(fonte.map((e) => e.professor))];
+    // Extrai os professores dinamicamente da fonte de dados atual
+    const allProfessors = [...new Set(fonte.map((e) => e.professor))].filter(Boolean);
 
+    // Tela de Loading enquanto busca na API
     if (carregando) {
         return (
-            <PageSection eyebrow="Biblioteca" title="Carregando...">
-                <p className="text-sm text-slate-500">Buscando exercícios...</p>
+            <PageSection eyebrow="Biblioteca" title="Carregando..." description="Aguarde um momento.">
+                <div className="flex justify-center py-12">
+                    <span className="text-sm font-semibold text-slate-400">Buscando exercícios do banco de dados...</span>
+                </div>
             </PageSection>
         );
     }
@@ -53,11 +66,7 @@ export function SubjectsPage() {
     return (
         <PageSection
             eyebrow="Biblioteca"
-            title={
-                query
-                    ? `Resultados para "${searchParams.get("q")}"`
-                    : "Escolha uma matéria"
-            }
+            title={query ? `Resultados para "${searchParams.get("q")}"` : "Escolha uma matéria"}
             description={
                 query
                     ? "Selecione uma matéria para ver os conteúdos relacionados à sua busca."
@@ -111,8 +120,7 @@ export function SubjectsPage() {
             </div>
 
             <p className="mb-5 text-sm font-semibold text-slate-500">
-                {filteredSubjects.length}{" "}
-                {filteredSubjects.length === 1 ? "matéria" : "matérias"}
+                {filteredSubjects.length} {filteredSubjects.length === 1 ? "matéria" : "matérias"}
             </p>
 
             {filteredSubjects.length ? (
@@ -125,12 +133,14 @@ export function SubjectsPage() {
                         const allSubjectExercises = fonte.filter(
                             (e) => (e.disciplina || e.subject) === item
                         );
-                        const concluded = allSubjectExercises.filter((e) =>
-                            completed.includes(e.id)
-                        ).length;
-                        const progress = Math.round(
-                            (concluded / allSubjectExercises.length) * 100
-                        );
+
+                        const concluded = allSubjectExercises.filter((e) => completed.includes(e.id)).length;
+                        const progress = Math.round((concluded / allSubjectExercises.length) * 100);
+
+                        // Garante que o card terá uma cor, mesmo se a API falhar em trazer a cor correta
+                        const currentColor = sample.cor || sample.color;
+                        const classColor = colorClasses[currentColor] || "bg-slate-50 text-slate-700 border-slate-200";
+
                         return (
                             <Link
                                 key={item}
@@ -138,7 +148,7 @@ export function SubjectsPage() {
                                 className="group flex min-h-52 flex-col rounded-2xl border border-slate-200 bg-white p-6 transition duration-300 hover:-translate-y-1 hover:border-orange-200 hover:shadow-[0_14px_35px_rgba(234,88,12,0.09)]"
                             >
                                 <div className="flex items-start justify-between">
-                                    <span className={`grid size-12 place-items-center rounded-xl border ${colorClasses[sample.cor || sample.color]}`}>
+                                    <span className={`grid size-12 place-items-center rounded-xl border ${classColor}`}>
                                         <Icon name="book" size={22} />
                                     </span>
                                     <div className="text-right">
@@ -152,13 +162,14 @@ export function SubjectsPage() {
                                         )}
                                     </div>
                                 </div>
+
                                 <h2 className="mt-5 text-xl font-extrabold tracking-[-0.025em] text-slate-900">
                                     {item}
                                 </h2>
                                 <p className="mt-1 text-sm text-slate-500">
-                                    {subjectExercises.length}{" "}
-                                    {subjectExercises.length === 1 ? "conteúdo disponível" : "conteúdos disponíveis"}
+                                    {subjectExercises.length} {subjectExercises.length === 1 ? "conteúdo disponível" : "conteúdos disponíveis"}
                                 </p>
+
                                 {enrolled.includes(item) && (
                                     <div className="mt-4">
                                         <div className="mb-1.5 flex justify-between text-[11px] font-bold text-slate-500">
@@ -173,6 +184,7 @@ export function SubjectsPage() {
                                         </div>
                                     </div>
                                 )}
+
                                 <span className="mt-auto flex items-center justify-between pt-6 text-sm font-bold text-orange-600">
                                     Ver conteúdos
                                     <span className="transition group-hover:translate-x-1">
