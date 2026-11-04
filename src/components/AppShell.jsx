@@ -94,6 +94,7 @@ export function AppShell() {
                 <footer className="border-t border-slate-200 bg-white px-5 py-6 text-center text-xs text-slate-400">
                     Exercita · Seu repositório de exercícios e soluções
                 </footer>
+                <DoubtModal />
             </div>
         </StudyProvider>
     )

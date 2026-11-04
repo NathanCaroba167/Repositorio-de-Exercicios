@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router";
 import { useStudy } from "../components/UseStudy";
 import { exercises } from "../data/exercises";
+import { useAuth } from "../components/AuthProvider";
+import { DuvidasSection } from "../components/DuvidasSection";
 import { PageSection } from "../components/PageSection";
 import { toSlug } from "../components/ToSlug";
 import { Icon } from "../components/Icon";
@@ -12,6 +14,7 @@ export function ExercisePage() {
     const { exerciseId } = useParams();
 
     const { completed, liked, toggleCompleted, toggleLiked, openDoubtModal } = useStudy();
+    const { usuario } = useAuth();
 
     const [showSolution, setShowSolution] = useState(false);
 
@@ -57,7 +60,7 @@ export function ExercisePage() {
     const difficulty = exercise.dificuldade || exercise.difficulty || "Intermediário";
     const lesson = exercise.aula || exercise.lesson || "Aula 1";
     const time = exercise.tempo || exercise.time || "Há pouco";
-    const engagement = exercise.engajamento || exercise.engagement || 12;
+    const engagement = exercise.total_uteis ?? exercise.engajamento ?? exercise.engagement ?? 0;
 
     return (
         <PageSection
@@ -93,13 +96,15 @@ export function ExercisePage() {
                             </span>
                         </div>
 
-                        <button
-                            onClick={() => openDoubtModal(subject, title)}
-                            className="mt-2 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-600 transition hover:border-orange-200 hover:text-orange-700 sm:mt-0"
-                        >
-                            <Icon name="doubt" size={24} />
-                            <span className="font-bold">Tirar dúvidas</span>
-                        </button>
+                        {usuario?.tipo !== "professor" && (
+                            <button
+                                onClick={() => openDoubtModal(subject, title, exercise.id)}
+                                className="mt-2 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-600 transition hover:border-orange-200 hover:text-orange-700 sm:mt-0"
+                            >
+                                <Icon name="doubt" size={16} />
+                                <span>Tirar dúvidas</span>
+                            </button>
+                        )}
                     </div>
 
                     <div className="px-6 py-7 sm:px-9 sm:py-9">
@@ -188,6 +193,7 @@ export function ExercisePage() {
                         </div>
                     </div>
                 </article>
+            <DuvidasSection exerciseId={exercise.id} />
             </div>
         </PageSection>
     );

@@ -15,7 +15,7 @@ module.exports = {
         title: 'Exercita API',
         version: '1.0.0',
         description:
-            'API da plataforma de integração aluno-professor (PET Computação UEL).\n\n' +
+            'API da plataforma de integração aluno-professor (PET Computação e Design UEL).\n\n' +
             'Para testar rotas protegidas: faça login em `POST /api/auth/login`, copie o `token` ' +
             'e clique em **Authorize** (cadeado), colando só o token.',
     },

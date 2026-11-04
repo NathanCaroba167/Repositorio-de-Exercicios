@@ -1,21 +1,59 @@
-import { useState } from "react";
-import { useSearchParams, Link, useParams } from "react-router";
+import { useState, useEffect } from "react";
+import { useParams, Link } from "react-router";
 import { useStudy } from "../components/UseStudy";
-import { exercises, subjects, professors, colorClasses } from "../data/exercises";
+import { useAuth } from "../components/AuthProvider";
+import { exercises as exerciciosEstaticos } from "../data/exercises";
 import { Icon } from "../components/Icon";
 import { PageSection } from "../components/PageSection";
 import { toSlug } from "../components/ToSlug";
-import { EmptyState } from "../components/EmptyState.jsx";
 import { NotFoundPage } from "./NotFoundPage";
-import { StatCard } from "../components/StatCard";
+import { getExercicios } from "../services/api";
+
+// Aceita o formato da API e o do exercises.js estático
+function normalizar(e) {
+    return {
+        id: e.id,
+        subject: e.disciplina || e.subject,
+        code: e.codigo || e.code,
+        title: e.titulo || e.title,
+        content: e.conteudo || e.content,
+        description: e.descricao || e.description,
+        professor: e.professor,
+        difficulty: e.dificuldade || e.difficulty,
+        lesson: e.aula || e.lesson,
+        engagement: e.total_uteis ?? e.engagement ?? 0,
+    };
+}
 
 export function SubjectPage() {
-    const { subjectSlug } = useParams()
-    const { enrolled, completed, toggleEnrolled } = useStudy()
-    const subject = subjects.find((item) => toSlug(item) === subjectSlug)
-    const items = exercises.filter((exercise) => exercise.subject === subject)
+    const { subjectSlug } = useParams();
+    const { enrolled, completed, toggleEnrolled, openDoubtModal } = useStudy();
+    const { usuario } = useAuth();
+    const [fonte, setFonte] = useState(null); // null = carregando
 
-    if (!subject || !items.length) return <NotFoundPage />
+    useEffect(() => {
+        getExercicios()
+            .then((dados) => setFonte(dados.length ? dados : exerciciosEstaticos))
+            .catch(() => setFonte(exerciciosEstaticos));
+    }, []);
+
+    if (fonte === null) {
+        return (
+            <PageSection eyebrow="Conteúdos da matéria" title="Carregando...">
+                <p className="text-sm text-slate-500">Buscando conteúdos...</p>
+            </PageSection>
+        );
+    }
+
+    const todos = fonte.map(normalizar);
+    const subject = [...new Set(todos.map((e) => e.subject))].find(
+        (s) => toSlug(s) === subjectSlug
+    );
+    const items = todos
+        .filter((e) => e.subject === subject)
+        .sort((a, b) => a.id - b.id);
+
+    if (!subject || !items.length) return <NotFoundPage />;
 
     return (
         <PageSection
@@ -23,15 +61,6 @@ export function SubjectPage() {
             title={subject}
             description={`${items[0].code} · ${items.length} conteúdos organizados para você estudar em sequência.`}
             action={
-                <div className="flex items-center gap-3">
-                    {enrolled.includes(subject) && (
-                        <button
-                            onClick={() => openDoubtModal(subject)}
-                            className="hidden items-center rounded-xl bg-[#fb923c] px-6 py-2.5 text-sm font-bold text-slate-900 transition hover:bg-orange-500 sm:inline-flex"
-                        >
-                            Tirar dúvidas
-                        </button>
-                    )}
                 <button
                     onClick={() => toggleEnrolled(subject)}
                     className={`hidden items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition sm:inline-flex ${
@@ -40,15 +69,9 @@ export function SubjectPage() {
                             : "bg-orange-600 text-white hover:bg-orange-700"
                     }`}
                 >
-                    <Icon
-                        name={enrolled.includes(subject) ? "check" : "bookmark"}
-                        size={17}
-                    />
-                    {enrolled.includes(subject)
-                        ? "Matéria em curso"
-                        : "Adicionar ao meu curso"}
+                    <Icon name={enrolled.includes(subject) ? "check" : "bookmark"} size={17} />
+                    {enrolled.includes(subject) ? "Matéria em curso" : "Adicionar ao meu curso"}
                 </button>
-                </div>
             }
         >
             <div className="sticky top-[74px] z-20 -mx-5 mb-8 border-y border-slate-200 bg-[#f7f8fb]/95 px-5 py-3 backdrop-blur lg:-mx-8 lg:px-8">
@@ -92,15 +115,23 @@ export function SubjectPage() {
                                         <span>{exercise.difficulty}</span>
                                         <span>{exercise.engagement} estudantes acharam útil</span>
                                     </div>
-                                    <Link
-                                        to={`/exercicios/${exercise.id}`}
-                                        className="inline-flex items-center gap-2 rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-orange-700"
-                                    >
-                                        {completed.includes(exercise.id)
-                                            ? "Revisar exercício"
-                                            : "Abrir exercício"}{" "}
-                                        <Icon name="arrow" size={16} />
-                                    </Link>
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        {usuario?.tipo !== "professor" && (
+                                            <button
+                                                onClick={() => openDoubtModal(subject, exercise.title, exercise.id)}
+                                                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-bold text-slate-600 transition hover:border-orange-200 hover:text-orange-700"
+                                            >
+                                                <Icon name="doubt" size={16} /> Tirar dúvida
+                                            </button>
+                                        )}
+                                        <Link
+                                            to={`/exercicios/${exercise.id}`}
+                                            className="inline-flex items-center gap-2 rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-orange-700"
+                                        >
+                                            {completed.includes(exercise.id) ? "Revisar exercício" : "Abrir exercício"}{" "}
+                                            <Icon name="arrow" size={16} />
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -108,5 +139,5 @@ export function SubjectPage() {
                 ))}
             </div>
         </PageSection>
-    )
+    );
 }

@@ -55,3 +55,9 @@ export function getExercicios(filtros = {}) {
 }
 
 export const getExercicioPorId = (id) => requisitar(`/exercicios/${id}`);
+
+export const criarDuvida = (exercicio_id, pergunta) =>
+    requisitar('/duvidas', { method: 'POST', body: { exercicio_id, pergunta } });
+
+export const getDuvidas = (exercicioId) =>
+    requisitar(`/duvidas?exercicio_id=${exercicioId}`);

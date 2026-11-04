@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router";
+import { useNavigate } from "react-router";
+import { useAuth } from "../components/AuthProvider";
 import { Icon } from "../components/Icon";
 
 export function SearchPage() {
     const navigate = useNavigate()
+    const { usuario } = useAuth();
     const [search, setSearch] = useState("")
     const [isPopUpOpen, setIsPopUpOpen] = useState(true) // Estado para controlar o pop-up flutuante
 
@@ -99,7 +101,7 @@ export function SearchPage() {
             </div>
 
             {/* O POP-UP FLUTUANTE ADICIONADO AQUI (Com escala de 70%) */}
-            {isPopUpOpen && (
+            {isPopUpOpen && !usuario && (
                 <div className="fixed bottom-6 right-6 z-40 origin-bottom-right scale-[0.70]">
                     <div className="relative w-[340px] rounded-[32px] border border-slate-200/60 bg-white/90 p-8 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] backdrop-blur-xl">
 
