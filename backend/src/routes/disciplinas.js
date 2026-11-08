@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/database');
+const { autenticar, soProfessor } = require('../middlewares/autenticar');
 
-router.get('/', async (req, res) => {
+// Disciplinas do professor logado (o painel usa para escolher onde trabalhar)
+router.get('/minhas', autenticar, soProfessor, async (req, res) => {
     try {
         const r = await pool.query(
-            `SELECT d.id, d.nome, d.codigo, d.cor, u.nome AS professor
-       FROM disciplinas d
-       JOIN usuarios u ON d.professor_id = u.id
-       ORDER BY d.nome`
+            'SELECT id, nome, codigo, cor FROM disciplinas WHERE professor_id = $1 ORDER BY nome',
+            [req.usuario.id]
         );
         res.json(r.rows);
     } catch (err) {
