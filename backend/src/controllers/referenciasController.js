@@ -3,38 +3,49 @@ const path = require('path');
 const pool = require('../config/database');
 
 const PASTA = path.join(__dirname, '..', '..', 'uploads');
+const TIPOS = ['aula', 'material', 'referencia'];
+const URL_VALIDA = /^https?:\/\/\S+$/i;
 
 function apagarArquivo(nome) {
     if (nome) fs.unlink(path.join(PASTA, nome), () => {});
 }
 
-// Professor posta material na SUA disciplina
+// Professor posta conteúdo na SUA disciplina
 async function criar(req, res) {
     const arquivo = req.file ? req.file.filename : null;
-    try {
-        const { titulo, aula, disciplina_id, url } = req.body;
+    const recusar = (status, erro) => {
+        apagarArquivo(arquivo);
+        return res.status(status).json({ erro });
+    };
 
-        if (!titulo || !disciplina_id) {
-            apagarArquivo(arquivo);
-            return res.status(400).json({ erro: 'Informe titulo e disciplina_id' });
+    try {
+        const { titulo, aula, descricao, formato } = req.body;
+        const tipo = req.body.tipo || 'referencia';
+        const url = typeof req.body.url === 'string' ? req.body.url.trim() : '';
+        const disciplinaId = Number(req.body.disciplina_id);
+
+        if (!TIPOS.includes(tipo)) return recusar(400, 'Tipo inválido');
+        if (typeof titulo !== 'string' || !titulo.trim() || !Number.isInteger(disciplinaId)) {
+            return recusar(400, 'Informe titulo e disciplina_id');
         }
-        if (!arquivo && !url) {
-            return res.status(400).json({ erro: 'Envie um PDF ou informe um link' });
+        if (url && !URL_VALIDA.test(url)) {
+            return recusar(400, 'O link deve começar com http:// ou https://');
         }
+        if (tipo === 'material' && !arquivo) return recusar(400, 'Materiais exigem um PDF');
+        if (!arquivo && !url) return recusar(400, 'Envie um PDF ou informe um link');
 
         const dono = await pool.query(
             'SELECT id FROM disciplinas WHERE id = $1 AND professor_id = $2',
-            [disciplina_id, req.usuario.id]
+            [disciplinaId, req.usuario.id]
         );
         if (!dono.rows.length) {
-            apagarArquivo(arquivo);
-            return res.status(403).json({ erro: 'Você só pode postar materiais nas suas disciplinas' });
+            return recusar(403, 'Você só pode postar materiais nas suas disciplinas');
         }
 
         const r = await pool.query(
-            `INSERT INTO referencias (titulo, aula, url, arquivo, disciplina_id)
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-            [titulo.trim(), aula || null, url || null, arquivo, disciplina_id]
+            `INSERT INTO referencias (titulo, aula, tipo, formato, descricao, url, arquivo, disciplina_id)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+            [titulo.trim(), aula || null, tipo, formato || null, descricao || null, url || null, arquivo, disciplinaId]
         );
         res.status(201).json(r.rows[0]);
     } catch (err) {
@@ -43,21 +54,30 @@ async function criar(req, res) {
     }
 }
 
-// Qualquer usuário logado lista os materiais de uma disciplina
+// Qualquer usuário logado lista, com filtro opcional por tipo
 async function listar(req, res) {
     try {
-        const { disciplina_id } = req.query;
-        if (!disciplina_id) {
+        const disciplinaId = Number(req.query.disciplina_id);
+        if (!Number.isInteger(disciplinaId)) {
             return res.status(400).json({ erro: 'Informe disciplina_id' });
         }
+        const params = [disciplinaId];
+        let filtro = '';
+        if (req.query.tipo) {
+            if (!TIPOS.includes(req.query.tipo)) {
+                return res.status(400).json({ erro: 'Tipo inválido' });
+            }
+            params.push(req.query.tipo);
+            filtro = ' AND tipo = $2';
+        }
         const r = await pool.query(
-            `SELECT id, titulo, aula, url, criado_em,
+            `SELECT id, titulo, aula, tipo, formato, descricao, url, criado_em,
               CASE WHEN arquivo IS NULL THEN NULL
                    ELSE '/uploads/' || arquivo END AS arquivo_url
        FROM referencias
-       WHERE disciplina_id = $1
-       ORDER BY aula, criado_em DESC`,
-            [disciplina_id]
+       WHERE disciplina_id = $1${filtro}
+       ORDER BY criado_em ASC`,
+            params
         );
         res.json(r.rows);
     } catch (err) {
@@ -65,16 +85,16 @@ async function listar(req, res) {
     }
 }
 
-// Professor remove material da sua disciplina
+// Professor remove conteúdo da sua disciplina
 async function remover(req, res) {
     try {
         const { id } = req.params;
         const r = await pool.query(
             `DELETE FROM referencias
-       WHERE id = $1 AND disciplina_id IN (
-         SELECT id FROM disciplinas WHERE professor_id = $2
-       )
-       RETURNING arquivo`,
+             WHERE id = $1 AND disciplina_id IN (
+                 SELECT id FROM disciplinas WHERE professor_id = $2
+             )
+                 RETURNING arquivo`,
             [id, req.usuario.id]
         );
         if (!r.rows.length) {

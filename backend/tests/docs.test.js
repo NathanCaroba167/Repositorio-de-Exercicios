@@ -15,7 +15,8 @@ describe('documentação', () => {
             '/api/auth/cadastrar', '/api/auth/login',
             '/api/exercicios', '/api/exercicios/{id}',
             '/api/duvidas', '/api/duvidas/pendentes', '/api/duvidas/{id}/responder',
-            '/api/disciplinas', '/api/referencias', '/api/referencias/{id}',
+            '/api/duvidas/publicas', '/api/duvidas/minhas', '/api/duvidas/professor', '/api/duvidas/{id}/lida', '/api/duvidas/{id}/resolvida',
+            '/api/disciplinas', '/api/disciplinas/minhas', '/api/referencias', '/api/referencias/{id}',
             '/api/progresso', '/api/progresso/{tipo}/{id}',
         ];
         rotas.forEach((r) => expect(openapi.paths[r]).toBeDefined());

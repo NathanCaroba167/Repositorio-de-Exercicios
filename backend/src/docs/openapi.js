@@ -182,6 +182,7 @@ module.exports = {
                     { name: 'disciplina', in: 'query', schema: { type: 'string' }, description: 'Nome da disciplina' },
                     { name: 'dificuldade', in: 'query', schema: { type: 'string' } },
                     { name: 'q', in: 'query', schema: { type: 'string' }, description: 'Busca em título, conteúdo e descrição' },
+                    { name: 'disciplina_id', in: 'query', schema: { type: 'integer' } },
                 ],
                 responses: {
                     200: { description: 'OK', content: { 'application/json': { schema: { type: 'array', items: { $ref: '#/components/schemas/Exercicio' } } } } },
@@ -291,6 +292,61 @@ module.exports = {
                 },
             },
         },
+        '/api/duvidas/publicas': {
+            get: {
+                tags: ['Dúvidas'],
+                summary: 'Dúvidas respondidas e públicas de uma disciplina (sem o nome do aluno)',
+                security: bearer,
+                parameters: [{ name: 'disciplina_id', in: 'query', required: true, schema: { type: 'integer' } }],
+                responses: { 200: { description: 'OK' }, 400: erro('disciplina_id inválido'), 401: erro('Sem token') },
+            },
+        },
+        '/api/duvidas/minhas': {
+            get: {
+                tags: ['Dúvidas'],
+                summary: 'Todas as dúvidas do aluno logado',
+                security: bearer,
+                responses: { 200: { description: 'OK' }, 401: erro('Sem token') },
+            },
+        },
+        '/api/duvidas/professor': {
+            get: {
+                tags: ['Dúvidas'],
+                summary: 'Dúvidas de uma disciplina do professor (pendentes ou respondidas)',
+                security: bearer,
+                parameters: [
+                    { name: 'disciplina_id', in: 'query', required: true, schema: { type: 'integer' } },
+                    { name: 'status', in: 'query', schema: { type: 'string', enum: ['pendentes', 'respondidas'] } },
+                ],
+                responses: { 200: { description: 'OK' }, 400: erro('disciplina_id inválido'), 403: erro('Não é professor') },
+            },
+        },
+        '/api/duvidas/{id}/lida': {
+            put: {
+                tags: ['Dúvidas'],
+                summary: 'Professor marca como lida',
+                security: bearer,
+                parameters: [idPath()],
+                responses: { 200: { description: 'OK' }, 404: erro('Dúvida não encontrada para as suas disciplinas') },
+            },
+        },
+        '/api/duvidas/{id}/resolvida': {
+            put: {
+                tags: ['Dúvidas'],
+                summary: 'Aluno marca "Entendi" (só na própria dúvida, já respondida)',
+                security: bearer,
+                parameters: [idPath()],
+                responses: { 200: { description: 'OK' }, 404: erro('Não encontrada ou sem resposta') },
+            },
+        },
+        '/api/disciplinas/minhas': {
+            get: {
+                tags: ['Disciplinas'],
+                summary: 'Disciplinas do professor logado',
+                security: bearer,
+                responses: { 200: { description: 'OK' }, 403: erro('Não é professor') },
+            },
+        },
         '/api/disciplinas': {
             get: {
                 tags: ['Disciplinas'],
@@ -305,7 +361,10 @@ module.exports = {
                 tags: ['Referências'],
                 summary: 'Lista materiais de uma disciplina (logado)',
                 security: bearer,
-                parameters: [{ name: 'disciplina_id', in: 'query', required: true, schema: { type: 'integer' } }],
+                parameters: [
+                    { name: 'disciplina_id', in: 'query', required: true, schema: { type: 'integer' } },
+                    { name: 'tipo', in: 'query', schema: { type: 'string', enum: ['aula', 'material', 'referencia'] } },
+                ],
                 responses: {
                     200: { description: 'OK', content: { 'application/json': { schema: { type: 'array', items: { $ref: '#/components/schemas/Referencia' } } } } },
                     400: erro('disciplina_id faltando'), 401: erro('Sem token'),
@@ -326,6 +385,9 @@ module.exports = {
                                     disciplina_id: { type: 'integer' },
                                     url: { type: 'string' },
                                     arquivo: { type: 'string', format: 'binary' },
+                                    tipo: { type: 'string' },
+                                    formato: { type: 'string' },
+                                    descricao: { type: 'string' },
                                 },
                             } } },
                 },

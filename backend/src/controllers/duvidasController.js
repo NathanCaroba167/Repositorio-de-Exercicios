@@ -194,7 +194,28 @@ async function marcarResolvida(req, res) {
     }
 }
 
+// Dúvidas respondidas e públicas de uma disciplina (nunca expõe o nome do aluno)
+async function publicas(req, res) {
+    try {
+        const disciplinaId = Number(req.query.disciplina_id);
+        if (!Number.isInteger(disciplinaId)) {
+            return res.status(400).json({ erro: 'Informe disciplina_id' });
+        }
+        const r = await pool.query(
+            `SELECT du.id, du.pergunta, du.resposta, du.exercicio_id
+       FROM duvidas du
+       JOIN exercicios e ON du.exercicio_id = e.id
+       WHERE e.disciplina_id = $1 AND du.publica = TRUE AND du.resposta IS NOT NULL
+       ORDER BY du.respondido_em DESC`,
+            [disciplinaId]
+        );
+        res.json(r.rows);
+    } catch (err) {
+        res.status(500).json({ erro: err.message });
+    }
+}
+
 module.exports = {
     criar, listarPorExercicio, pendentes, doProfessor, minhas,
-    responder, marcarLida, marcarResolvida,
+    responder, marcarLida, marcarResolvida, publicas,
 };

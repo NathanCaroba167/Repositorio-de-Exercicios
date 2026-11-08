@@ -3,7 +3,7 @@ const pool = require('../config/database');
 // Listar todos os exercícios (com filtros opcionais)
 async function listar(req, res) {
     try {
-        const { disciplina, dificuldade, q } = req.query;
+        const { disciplina, disciplina_id, dificuldade, q } = req.query;
 
         let query = `
       SELECT e.id, e.titulo, e.conteudo, e.descricao, e.solucao,
@@ -21,6 +21,14 @@ async function listar(req, res) {
         if (disciplina) {
             params.push(disciplina);
             query += ` AND d.nome ILIKE $${params.length}`;
+        }
+        if (disciplina_id) {
+            const id = Number(disciplina_id);
+            if (!Number.isInteger(id)) {
+                return res.status(400).json({ erro: 'disciplina_id inválido' });
+            }
+            params.push(id);
+            query += ` AND d.id = $${params.length}`;
         }
         if (dificuldade) {
             params.push(dificuldade);
