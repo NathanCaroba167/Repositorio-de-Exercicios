@@ -33,6 +33,11 @@ describe('leitura', () => {
         const nao = await request(app).get('/api/exercicios/9999');
         expect(nao.status).toBe(404);
     });
+
+    it('a listagem traz disciplina_id', async () => {
+        const res = await request(app).get('/api/exercicios');
+        expect(res.body[0].disciplina_id).toBe(ctx.ids.algoritmos);
+    });
 });
 
 describe('escrita: quem pode o quê', () => {

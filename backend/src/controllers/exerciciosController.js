@@ -7,7 +7,7 @@ async function listar(req, res) {
 
         let query = `
       SELECT e.id, e.titulo, e.conteudo, e.descricao, e.solucao,
-             e.dificuldade, e.aula, e.criado_em,
+             e.dificuldade, e.aula, e.criado_em, e.disciplina_id,
              d.nome AS disciplina, d.codigo, d.cor,
              u.nome AS professor,
             (SELECT COUNT(*) FROM uteis WHERE exercicio_id = e.id)::int AS total_uteis
