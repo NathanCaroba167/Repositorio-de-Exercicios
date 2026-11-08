@@ -7,19 +7,9 @@ export function AuthProvider({ children }) {
     // Inicia a sessão lendo do localStorage/API através da função lerSessao()
     const [sessao, setSessao] = useState(() => lerSessao());
 
-    function entrar(dadosDaApi) {
-        // Garantindo que todo usuário tem a propriedade 'tipo' para a nova tela.
-        // NOTA: Se no futuro a sua API já enviar "tipo: 'professor'", remova esse "|| 'professor'"
-        const dadosDoUsuarioComTipo = {
-            ...dadosDaApi, // Mantém o token e os dados originais da API
-            usuario: {
-                ...dadosDaApi.usuario,
-                tipo: dadosDaApi.usuario?.tipo || "professor", // Define 'professor' para testes da nova aba
-            }
-        };
-
-        salvarSessao(dadosDoUsuarioComTipo);
-        setSessao(dadosDoUsuarioComTipo);
+    function entrar(dados) { // { usuario, token }, exatamente como a API devolve
+        salvarSessao(dados);
+        setSessao(dados);
     }
 
     function sair() {

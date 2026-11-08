@@ -11,6 +11,7 @@ import { ExercisePage } from "./pages/ExercisePage";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { GerenciarDisciplinaPage } from "./pages/GerenciarDisciplinaPage";
+import { RotaProfessor } from "./components/RotaProfessor";
 
 export const router = createBrowserRouter([
     { path: "/login", Component: LoginPage },
@@ -23,7 +24,13 @@ export const router = createBrowserRouter([
             { path: "materias", Component: SubjectsPage },
             { path: "materias/:subjectSlug", Component: SubjectPage },
             { path: "meu-curso", Component: MyCoursePage },
-            { path: "gerenciar-disciplina", Component: GerenciarDisciplinaPage }, // Nova rota adicionada aqui
+            { path: "gerenciar-disciplina",
+                element: (
+                    <RotaProfessor>
+                        <GerenciarDisciplinaPage />
+                    </RotaProfessor>
+                )
+            },
             { path: "exercicios/:exerciseId", Component: ExercisePage },
             { path: "recentes", Component: RecentPage },
             { path: "*", Component: NotFoundPage },

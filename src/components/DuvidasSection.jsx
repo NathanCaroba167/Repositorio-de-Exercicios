@@ -21,7 +21,7 @@ export function DuvidasSection({ exerciseId }) {
 
     return (
         <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
-            <h2 className="text-sm font-extrabold text-slate-900">Dúvidas deste exercício</h2>
+            <h2 className="text-sm font-extrabold text-slate-900">Suas dúvidas e respostas públicas</h2>
 
             {!usuario ? (
                 <p className="mt-3 text-sm text-slate-500">
@@ -31,13 +31,13 @@ export function DuvidasSection({ exerciseId }) {
             ) : erro ? (
                 <p role="alert" className="mt-3 text-sm text-red-700">{erro}</p>
             ) : duvidas.length === 0 ? (
-                <p className="mt-3 text-sm text-slate-500">Nenhuma dúvida ainda. Seja o primeiro a perguntar.</p>
+                <p className="mt-3 text-sm text-slate-500">Nenhuma dúvida por aqui ainda. Use "Tirar dúvida" para perguntar ao professor.</p>
             ) : (
                 <ul className="mt-4 space-y-4">
                     {duvidas.map((d) => (
                         <li key={d.id} className="rounded-xl border border-slate-100 bg-slate-50 p-4">
                             <div className="flex items-center justify-between text-xs text-slate-400">
-                                <span className="font-bold text-slate-600">{d.aluno}</span>
+                                <span className="font-bold text-slate-600">{d.aluno ?? "Outro aluno"}</span>
                                 <span>{new Date(d.criado_em).toLocaleDateString("pt-BR")}</span>
                             </div>
                             <p className="mt-2 whitespace-pre-wrap text-sm text-slate-800">{d.pergunta}</p>

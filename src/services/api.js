@@ -61,3 +61,15 @@ export const criarDuvida = (exercicio_id, pergunta) =>
 
 export const getDuvidas = (exercicioId) =>
     requisitar(`/duvidas?exercicio_id=${exercicioId}`);
+
+export const getMinhasDisciplinas = () => requisitar('/disciplinas/minhas');
+export const getMinhasDuvidas = () => requisitar('/duvidas/minhas');
+
+export const getDuvidasProfessor = (disciplinaId, status) =>
+    requisitar(`/duvidas/professor?disciplina_id=${disciplinaId}&status=${status}`);
+
+export const responderDuvida = (id, resposta, publica) =>
+    requisitar(`/duvidas/${id}/responder`, { method: 'PUT', body: { resposta, publica } });
+
+export const marcarDuvidaLida = (id) => requisitar(`/duvidas/${id}/lida`, { method: 'PUT' });
+export const marcarDuvidaResolvida = (id) => requisitar(`/duvidas/${id}/resolvida`, { method: 'PUT' });
